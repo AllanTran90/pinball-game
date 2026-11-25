@@ -48,9 +48,10 @@ export type Table = {
 
 const ARC_CENTER = { x: 230, y: 222 };
 const ARC_RADIUS = 210;
-const CENTER_X = (20 + LANE_LEFT) / 2;
+/** Horizontal center of the playfield (left wall to plunger lane). */
+export const PLAYFIELD_CENTER_X = (20 + LANE_LEFT) / 2;
 
-const mirror = (p: Vec): Vec => ({ x: CENTER_X * 2 - p.x, y: p.y });
+const mirror = (p: Vec): Vec => ({ x: PLAYFIELD_CENTER_X * 2 - p.x, y: p.y });
 
 function makeFlipper(pivot: Vec, side: 1 | -1): Flipper {
   // Right flipper angles are mirrored around the vertical axis.

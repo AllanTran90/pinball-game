@@ -32,7 +32,7 @@ import {
   type Ball,
 } from "./physics";
 import { createGoals, goalProgress, setGoal, type GoalId, type GoalProgress } from "./goals";
-import { createTable, type Segment, type Table } from "./table";
+import { createTable, PLAYFIELD_CENTER_X, type Segment, type Table } from "./table";
 import type { Vec } from "./vec";
 
 export type GameStatus = "ready" | "playing" | "over";
@@ -49,7 +49,15 @@ export type Hud = {
 export type InputState = { left: boolean; right: boolean; plunger: boolean };
 
 export type Particle = { x: number; y: number; vx: number; vy: number; life: number; color: string };
-export type Popup = { x: number; y: number; text: string; life: number };
+export type Popup = {
+  x: number;
+  y: number;
+  text: string;
+  life: number;
+  /** Big glowing popups (e.g. "+1 BOLL") set these; score popups use the defaults. */
+  color?: string;
+  size?: number;
+};
 
 const BALL_SAVE_TIME = 5;
 const MIN_TRIGGER_IMPACT = 60;
@@ -293,8 +301,16 @@ export class Game {
     if (earned === 0) return;
     this.extraBalls += earned;
     this.showMessage("EXTRA BALL!");
-    this.burst(TABLE_WIDTH / 2, TABLE_HEIGHT / 2, COLORS.extraBall);
-    this.burst(TABLE_WIDTH / 2, TABLE_HEIGHT / 2, COLORS.target);
+    this.popups.push({
+      x: PLAYFIELD_CENTER_X,
+      y: 420,
+      text: `+${earned} BOLL`,
+      life: 1.6,
+      color: COLORS.extraBall,
+      size: 34,
+    });
+    this.burst(PLAYFIELD_CENTER_X, TABLE_HEIGHT / 2, COLORS.extraBall);
+    this.burst(PLAYFIELD_CENTER_X, TABLE_HEIGHT / 2, COLORS.target);
   }
 
   private showMessage(text: string) {

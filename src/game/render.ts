@@ -10,7 +10,7 @@ import {
 } from "./constants";
 import { COLORS, type Game } from "./engine";
 import { flipperTip } from "./physics";
-import type { Segment, Table } from "./table";
+import { PLAYFIELD_CENTER_X, type Segment, type Table } from "./table";
 import type { Vec } from "./vec";
 
 type Ctx = CanvasRenderingContext2D;
@@ -114,7 +114,7 @@ export function drawStatic(ctx: Ctx, table: Table) {
   ctx.fillStyle = "rgba(167, 139, 250, 0.35)";
   ctx.font = FONT;
   ctx.textAlign = "center";
-  ctx.fillText("· NEON DRIFT ·", 212, 800);
+  ctx.fillText("· NEON DRIFT ·", PLAYFIELD_CENTER_X, 800);
 }
 
 // --- Dynamic layer (every frame) ------------------------------------------
@@ -215,13 +215,12 @@ export function drawFrame(ctx: Ctx, game: Game, staticLayer: CanvasImageSource, 
     ctx.fillRect(p.x - 1.5, p.y - 1.5, 3, 3);
   }
 
-  // Score popups
-  ctx.font = FONT;
+  // Score popups, plus big glowing ones like "+1 BOLL"
   ctx.textAlign = "center";
   for (const p of game.popups) {
-    ctx.globalAlpha = p.life;
-    ctx.fillStyle = "#ffffff";
-    ctx.fillText(p.text, p.x, p.y);
+    ctx.globalAlpha = Math.min(1, p.life);
+    ctx.font = p.size ? `900 ${p.size}px ui-sans-serif, system-ui, sans-serif` : FONT;
+    glow(ctx, p.color ?? "#ffffff", p.color ? 24 : 0, () => ctx.fillText(p.text, p.x, p.y));
   }
   ctx.globalAlpha = 1;
   ctx.restore();
@@ -271,7 +270,7 @@ function drawMessage(ctx: Ctx, text: string, life: number) {
   ctx.textAlign = "center";
   glow(ctx, FLIPPER_COLOR, 24, () => {
     ctx.fillStyle = "#ffffff";
-    ctx.fillText(text, 212, 470);
+    ctx.fillText(text, PLAYFIELD_CENTER_X, 470);
   });
   ctx.restore();
 }

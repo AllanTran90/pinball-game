@@ -228,7 +228,12 @@ function Stat({ label, value, accent, extra }: { label: string; value: string; a
       <p className="label">{label}</p>
       <p className={accent ? "stat-value accent" : "stat-value"}>
         {value}
-        {extra && <span className="stat-extra">{extra}</span>}
+        {/* key restarts the pop animation whenever the count changes */}
+        {extra && (
+          <span key={extra} className="stat-extra">
+            {extra}
+          </span>
+        )}
       </p>
     </div>
   );

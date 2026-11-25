@@ -134,9 +134,31 @@ body {
 }
 
 .stat-extra {
+  display: inline-block;
   margin-left: 6px;
   color: var(--gold);
   text-shadow: 0 0 10px rgb(253 224 71 / 0.6);
+  animation: pop 600ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes pop {
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.6);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stat-extra {
+    animation: none;
+  }
 }
 
 /* --- Extra ball goals ------------------------------------------------------ */
