@@ -1,5 +1,7 @@
-<!-- BEGIN:nextjs-agent-rules -->
-# This is NOT the Next.js you know
+# Project notes
 
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
-<!-- END:nextjs-agent-rules -->
+This is a Vite + React + TypeScript project. It does not use Next.js.
+
+- Start the dev server only with `npm run dev`. That command runs it through `scripts/dev-guard.sh`. The old Next.js dev server (Turbopack) filled this computer's memory and crashed macOS several times.
+- Game logic in `src/game/` is plain TypeScript. Keep React and DOM code out of it.
+- Check changes with `npm run build`, which typechecks and builds without starting a server.
