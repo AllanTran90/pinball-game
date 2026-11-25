@@ -18,5 +18,5 @@
   // Don't restore old terminals (and a dev server running in them) on startup
   "terminal.integrated.enablePersistentSessions": false,
   // Limit TypeScript server memory (MB)
-  "typescript.tsserver.maxTsServerMemory": 2048
+  "js/ts.tsserver.maxMemory": 2048
 }
