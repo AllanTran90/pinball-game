@@ -1,0 +1,22 @@
+{
+  // Don't watch build output and dependencies for file changes
+  "files.watcherExclude": {
+    "**/.next/**": true,
+    "**/node_modules/**": true,
+    "**/.git/objects/**": true
+  },
+  // Keep search and quick-open out of build output and dependencies
+  "search.exclude": {
+    "**/.next": true,
+    "**/node_modules": true,
+    "**/tsconfig.tsbuildinfo": true
+  },
+  // Hide the build cache from the Explorer
+  "files.exclude": {
+    "**/.next": true
+  },
+  // Don't restore old terminals (and a dev server running in them) on startup
+  "terminal.integrated.enablePersistentSessions": false,
+  // Limit TypeScript server memory (MB)
+  "typescript.tsserver.maxTsServerMemory": 2048
+}
