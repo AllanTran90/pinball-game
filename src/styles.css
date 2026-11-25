@@ -8,6 +8,7 @@
   --cyan: #67e8f9;
   --violet: #c4b5fd;
   --fuchsia: #e879f9;
+  --gold: #fde047;
   --gradient: linear-gradient(to right, #22d3ee, #d946ef);
   --radius: 28px;
   --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
@@ -54,15 +55,21 @@ body {
   gap: 16px;
 }
 
-.controls {
+.sidebar {
   order: 2;
-  display: grid;
+  display: flex;
   width: 100%;
   max-width: 460px;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  flex-direction: column;
+  gap: 24px;
   font-size: 12px;
   color: var(--muted);
+}
+
+.controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
 }
 
 .table-column {
@@ -79,10 +86,12 @@ body {
     justify-content: center;
     gap: 40px;
   }
-  .controls {
+  .sidebar {
     order: 1;
-    width: 224px;
+    width: 240px;
     margin-top: 112px;
+  }
+  .controls {
     grid-template-columns: 1fr;
   }
   .table-column {
@@ -122,6 +131,70 @@ body {
 
 .stat-value.accent {
   color: var(--cyan);
+}
+
+.stat-extra {
+  margin-left: 6px;
+  color: var(--gold);
+  text-shadow: 0 0 10px rgb(253 224 71 / 0.6);
+}
+
+/* --- Extra ball goals ------------------------------------------------------ */
+
+.goals {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.goal {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.goal-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.goal-name {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.goal-count {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.goal-hint {
+  font-size: 11px;
+  color: var(--faint);
+}
+
+.bar {
+  height: 4px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--border);
+}
+
+.bar > div {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--gradient);
+  transition: width 200ms;
+}
+
+.goal.done .goal-name,
+.goal.done .goal-count {
+  color: var(--gold);
+}
+
+.goal.done .bar > div {
+  background: var(--gold);
 }
 
 .control {
@@ -235,4 +308,78 @@ kbd {
 .hint {
   font-size: 11px;
   color: var(--faint);
+}
+
+/* --- High scores ------------------------------------------------------------ */
+
+.leaderboard {
+  width: min(260px, 80%);
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+}
+
+.leaderboard li {
+  display: grid;
+  grid-template-columns: 24px 1fr auto;
+  gap: 8px;
+  border-radius: 8px;
+  padding: 4px 8px;
+  color: var(--muted);
+}
+
+.leaderboard li:first-child {
+  color: var(--text);
+}
+
+.leaderboard li.highlight {
+  background: rgb(253 224 71 / 0.12);
+  color: var(--gold);
+}
+
+.leaderboard .rank {
+  color: var(--faint);
+  text-align: left;
+}
+
+.leaderboard .name {
+  overflow: hidden;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.leaderboard .points {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.name-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  pointer-events: auto;
+}
+
+.new-record {
+  font-weight: 700;
+  color: var(--gold);
+}
+
+.name-form input {
+  width: 200px;
+  border: 1px solid rgb(255 255 255 / 0.2);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.06);
+  padding: 10px 16px;
+  font: 600 16px var(--font-sans);
+  color: var(--text);
+  text-align: center;
+  outline: none;
+}
+
+.name-form input:focus {
+  border-color: var(--violet);
+  box-shadow: 0 0 0 3px rgb(196 181 253 / 0.25);
 }
