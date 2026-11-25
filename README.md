@@ -68,7 +68,7 @@ For 5 seconds after launch, a drained ball is given back with "BALL SAVED". This
 
 ### Extra balls
 
-Each goal awards one extra ball per step. A drained ball then comes back with "SHOOT AGAIN" and the same ball number. Progress shows in the sidebar.
+Each goal awards one extra ball per step. When you earn one, "EXTRA BALL!" and a glowing "+1 BOLL" appear on the table, and the ball counter in the HUD shows the extra balls you have left (for example `2 / 3 +1`). A drained ball then comes back with "SHOOT AGAIN" and the same ball number. Progress shows in the sidebar.
 
 | Goal | Steps |
 |---|---|
