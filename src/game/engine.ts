@@ -31,6 +31,7 @@ import {
   moveFlipper,
   type Ball,
 } from "./physics";
+import { createGoals, goalProgress, setGoal, type GoalId, type GoalProgress } from "./goals";
 import { createTable, type Segment, type Table } from "./table";
 import type { Vec } from "./vec";
 
@@ -39,9 +40,10 @@ export type GameStatus = "ready" | "playing" | "over";
 export type Hud = {
   status: GameStatus;
   score: number;
-  highScore: number;
   ball: number;
+  extraBalls: number;
   multiplier: number;
+  goals: GoalProgress[];
 };
 
 export type InputState = { left: boolean; right: boolean; plunger: boolean };
@@ -49,7 +51,6 @@ export type InputState = { left: boolean; right: boolean; plunger: boolean };
 export type Particle = { x: number; y: number; vx: number; vy: number; life: number; color: string };
 export type Popup = { x: number; y: number; text: string; life: number };
 
-const HIGH_SCORE_KEY = "pinball-high-score";
 const BALL_SAVE_TIME = 5;
 const MIN_TRIGGER_IMPACT = 60;
 
@@ -58,23 +59,8 @@ export const COLORS = {
   sling: "#c6ff3d",
   target: "#ffb020",
   rollover: "#4de1ff",
+  extraBall: "#fde047",
 } as const;
-
-function loadHighScore() {
-  try {
-    return Number(localStorage.getItem(HIGH_SCORE_KEY)) || 0;
-  } catch {
-    return 0;
-  }
-}
-
-function saveHighScore(score: number) {
-  try {
-    localStorage.setItem(HIGH_SCORE_KEY, String(score));
-  } catch {
-    // Storage unavailable (private mode etc.) — high score just won't persist.
-  }
-}
 
 export class Game {
   table: Table = createTable();
@@ -84,9 +70,10 @@ export class Game {
 
   status: GameStatus = "ready";
   score = 0;
-  highScore = loadHighScore();
   ballNumber = 1;
+  extraBalls = 0;
   multiplier = 1;
+  goals = createGoals();
 
   plungerCharge = 0;
   shake = 0;
@@ -109,7 +96,9 @@ export class Game {
     this.table = createTable();
     this.score = 0;
     this.ballNumber = 1;
+    this.extraBalls = 0;
     this.multiplier = 1;
+    this.goals = createGoals();
     this.ballSaveUsed = false;
     this.status = "playing";
     this.spawnBall();
@@ -197,6 +186,7 @@ export class Game {
       this.shake = Math.max(this.shake, 4);
       this.burst(bumper.x + c.nx * bumper.r, bumper.y + c.ny * bumper.r, COLORS.bumper);
       this.award(SCORE_BUMPER, bumper.x, bumper.y - bumper.r);
+      this.progress("bumpers", this.goals.bumpers.value + 1);
     }
 
     for (const f of this.table.flippers) collideFlipper(b, f, FLIPPER_RESTITUTION);
@@ -224,6 +214,7 @@ export class Game {
         this.targetCelebrate = 1.5;
         this.award(SCORE_TARGET_COMPLETE, 110, 460);
         this.showMessage("TARGETS COMPLETE");
+        this.progress("targets", this.goals.targets.value + 1);
       }
     }
   }
@@ -243,6 +234,7 @@ export class Game {
       this.multiplier = Math.min(MAX_MULTIPLIER, this.multiplier + 1);
       this.award(SCORE_ROLLOVER_COMPLETE, 227, 130);
       this.showMessage(`MULTIPLIER ×${this.multiplier}`);
+      this.progress("multiplier", this.multiplier);
     }
   }
 
@@ -255,16 +247,23 @@ export class Game {
     if (this.ballSave > 0) {
       this.ballSaveUsed = true;
       this.showMessage("BALL SAVED");
+    } else if (this.extraBalls > 0) {
+      this.extraBalls--;
+      this.startNextBall("SHOOT AGAIN");
     } else if (this.ballNumber >= BALLS_PER_GAME) {
       this.gameOver();
       return;
     } else {
       this.ballNumber++;
-      this.multiplier = 1;
-      this.ballSaveUsed = false;
-      this.showMessage(`BALL ${this.ballNumber}`);
+      this.startNextBall(`BALL ${this.ballNumber}`);
     }
     this.spawnBall();
+  }
+
+  private startNextBall(message: string) {
+    this.multiplier = 1;
+    this.ballSaveUsed = false;
+    this.showMessage(message);
   }
 
   private spawnBall() {
@@ -277,10 +276,6 @@ export class Game {
   private gameOver() {
     this.status = "over";
     this.trail = [];
-    if (this.score > this.highScore) {
-      this.highScore = this.score;
-      saveHighScore(this.score);
-    }
   }
 
   // --- Scoring & effects -------------------------------------------------
@@ -289,6 +284,17 @@ export class Game {
     const total = points * this.multiplier;
     this.score += total;
     this.popups.push({ x, y, text: `+${total.toLocaleString("sv-SE")}`, life: 1 });
+    this.progress("score", this.score);
+  }
+
+  /** Reports a goal's new value and hands out any extra balls it earned. */
+  private progress(id: GoalId, value: number) {
+    const earned = setGoal(this.goals, id, value);
+    if (earned === 0) return;
+    this.extraBalls += earned;
+    this.showMessage("EXTRA BALL!");
+    this.burst(TABLE_WIDTH / 2, TABLE_HEIGHT / 2, COLORS.extraBall);
+    this.burst(TABLE_WIDTH / 2, TABLE_HEIGHT / 2, COLORS.target);
   }
 
   private showMessage(text: string) {
@@ -357,9 +363,10 @@ export class Game {
     const hud: Hud = {
       status: this.status,
       score: this.score,
-      highScore: Math.max(this.highScore, this.score),
       ball: this.ballNumber,
+      extraBalls: this.extraBalls,
       multiplier: this.multiplier,
+      goals: goalProgress(this.goals),
     };
     const key = JSON.stringify(hud);
     if (key === this.lastHud) return;
