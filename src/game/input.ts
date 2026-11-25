@@ -30,6 +30,8 @@ export function bindInput(
   const set = (action: Action, down: boolean) => (input[action] = down);
 
   const onKey = (down: boolean) => (e: KeyboardEvent) => {
+    // Let text fields (e.g. the high score name) receive keys normally.
+    if (e.target instanceof HTMLInputElement) return;
     const action = KEY_MAP[e.code];
     if (!action && e.code !== "Enter") return;
     e.preventDefault(); // keep Space/arrows from scrolling the page
